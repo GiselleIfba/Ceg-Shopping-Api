@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  
+  
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Product{
+
+id String @id @default(auto()) @map("_id") @db.ObjectId
+name String
+url_img String[]
+price_in_cent Int
+desc String?
+category String
+subCategory String
+options String[]
+store Store @relation(fields: [storeId], references: [id])
+storeId String @db.ObjectId
+comments Comments[]
+
+}
+
+model User{
+
+id String @id @default(auto()) @map("_id") @db.ObjectId
+first_name String
+last_name String
+url_img String?
+email String @unique
+password String 
+requests Request[]
+comments Comments[]
+
+}
+
+model Comments {
+
+id String @id @default(auto()) @map("_id") @db.ObjectId
+author   User   @relation(fields: [authorId], references: [id])
+authorId String @db.ObjectId
+product_commented  Product @relation(fields: [product_commentedId], references: [id])
+product_commentedId  String @db.ObjectId
+title String
+stars Int @default(0)
+
+}
+
+model Store {
+
+id String @id @default(auto()) @map("_id") @db.ObjectId
+name String
+email String @unique
+password String 
+url_img String
+cnpj Int @unique
+desc String?
+products Product[]
+}
+
+model Request{
+
+id String @id @default(auto()) @map("_id") @db.ObjectId
+state String @default("processando")
+date DateTime @default(now())
+delivered DateTime? 
+payer User? @relation(fields: [payerId], references: [id])
+payerId String? @db.ObjectId
+
+}
